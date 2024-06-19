@@ -14,7 +14,7 @@ const cronSchedule = Bun.env.CRON
 const initDb = { messages: [] }
 const db = await JSONFilePreset('db.json', initDb)
 
-const bot = new Telegraf(token)
+const bot = new Telegraf(token, { handlerTimeout: Infinity })
 
 const job = new CronJob(cronSchedule, () => {
     if (db.data.messages.length === 0) return
