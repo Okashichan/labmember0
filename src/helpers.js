@@ -59,7 +59,7 @@ const getMediaGroupMessage = async (id) => {
     const media = getMedia(await getRawPost(id))
     const url = media.info.pixivId ? `https://www.pixiv.net/artworks/${media.info.pixivId}` : media.info.sourceUrl
 
-    const caption = media.info.copyright.at(0).toLowerCase() === 'original' ?
+    const caption = media.info.copyright.toLowerCase() === 'original' ?
         fmt`${link(media.info.artist, url)} Original` :
         fmt`${link(media.info.artist, url)}
         \n${italic`Copyright`}\n${media.info.copyright}
