@@ -26,20 +26,16 @@ cron.schedule('0 5-23/2 * * *', () => {
 
 bot.use(async (ctx, next) => {
     const {
-        message:
+        text: userMsg,
+        from:
         {
-            text: userMsg,
-            from:
-            {
-                id: userId,
-                username: userUsername
-            }
+            id: userId,
+            username: userUsername
         }
-    } = ctx
+    } = ctx.callbackQuery || ctx.message
 
     if (!allowedUsers.includes(userId)) {
         console.log(`${userUsername}|${userId} sent a message: ${userMsg}`)
-        await next()
         return
     }
 
