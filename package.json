@@ -6,6 +6,8 @@
     "@types/bun": "latest"
   },
   "dependencies": {
+    "lowdb": "^7.0.1",
+    "node-cron": "^3.0.3",
     "telegraf": "^4.16.3"
   }
 }
