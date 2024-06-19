@@ -16,7 +16,7 @@ const db = await JSONFilePreset('db.json', initDb)
 
 const bot = new Telegraf(token)
 
-const job = new CronJob("* * * * * *", () => {
+const job = new CronJob(cronSchedule, () => {
     if (db.data.messages.length === 0) return
 
     bot.telegram.sendMediaGroup(channel, db.data.messages.at(0).message).then(() => {
