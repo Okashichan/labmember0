@@ -1,4 +1,19 @@
+import cronParser from 'cron-parser'
 import { fmt, italic, link, } from "telegraf/format"
+
+const calculateNextCronTime = (cronExpr, iterations = 1) => {
+    const interval = cronParser.parseExpression(cronExpr, { tz: Bun.env.TZ })
+
+    let next = undefined
+    while (iterations--) {
+        next = interval.next()
+    }
+
+    const ISO = next.toISOString()
+    const UTC = new Date(ISO)
+
+    return `${UTC.getHours().toString().padStart(2, '0')}:${UTC.getSeconds().toString().padStart(2, '0')} (${UTC.getDate().toString().padStart(2, '0')}/${(UTC.getMonth() + 1).toString().padStart(2, '0')})`
+}
 
 const stringNormalize = (str) => {
     let chunks = str.replace(/\([^)]*\)/g, '').split(' ')
@@ -82,4 +97,4 @@ const getMediaGroupMessage = async (id) => {
     return message
 }
 
-export default { getDanbooruId, getMediaGroupMessage }
+export default { getDanbooruId, getMediaGroupMessage, calculateNextCronTime }

@@ -9,20 +9,21 @@ import helpers from './src/helpers.js'
 const token = Bun.env.TELEGRAM_BOT_TOKEN
 const channel = Bun.env.TELEGRAM_CHANNEL
 const allowedUsers = Bun.env.ALLOWED_USERS
+const cronSchedule = Bun.env.CRON
 
 const initDb = { messages: [] }
 const db = await JSONFilePreset('db.json', initDb)
 
 const bot = new Telegraf(token)
 
-cron.schedule('0 5-23/2 * * *', () => {
+cron.schedule(cronSchedule, () => {
     if (db.data.messages.length === 0) return
 
     bot.telegram.sendMediaGroup(channel, db.data.messages.at(0).message).then(() => {
         console.log(`Sending: ${db.data.messages.at(0).booruId}.`)
         db.update(({ messages }) => messages.shift())
     })
-})
+}, { timezone: Bun.env.TZ })
 
 bot.use(async (ctx, next) => {
     const {
@@ -43,7 +44,7 @@ bot.use(async (ctx, next) => {
 })
 
 bot.on(message('link_preview_options'), async (ctx) => {
-    const { message: { text: userMsg } } = ctx
+    const { message: { text: userMsg, from: { username } } } = ctx
 
     const booruId = helpers.getDanbooruId(userMsg)
 
@@ -80,7 +81,7 @@ bot.on(message('link_preview_options'), async (ctx) => {
                 return
             }
 
-            db.update(({ messages }) => messages.push({ booruId, message }))
+            db.update(({ messages }) => messages.push({ booruId, message, username }))
 
             await db.write()
 
@@ -97,10 +98,10 @@ bot.command('scheduled', async (ctx) => {
 
     let scheduled = fmt`${bold`Заплановані пости:`}\n`
 
-    db.data.messages.forEach(({ booruId }) => {
+    db.data.messages.forEach(({ booruId, username }, index) => {
         const url = `https://danbooru.donmai.us/posts/${booruId}`
 
-        scheduled = fmt`${scheduled}[${link(`${booruId}`, url)}]\n`
+        scheduled = fmt`${scheduled}[${link(`${booruId}`, url)}] by ${username} at ${helpers.calculateNextCronTime(cronSchedule, index + 1)}\n`
     })
 
     ctx.reply(scheduled, { disable_web_page_preview: true })
