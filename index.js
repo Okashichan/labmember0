@@ -1,7 +1,7 @@
 import { Telegraf, Markup } from 'telegraf'
 import { message } from 'telegraf/filters'
 import { fmt, link, bold } from "telegraf/format"
-import cron from 'node-cron'
+import { CronJob } from 'cron'
 import { JSONFilePreset } from 'lowdb/node'
 import crypto from 'crypto'
 import helpers from './src/helpers.js'
@@ -16,14 +16,14 @@ const db = await JSONFilePreset('db.json', initDb)
 
 const bot = new Telegraf(token)
 
-cron.schedule(cronSchedule, () => {
+const job = new CronJob("* * * * * *", () => {
     if (db.data.messages.length === 0) return
 
     bot.telegram.sendMediaGroup(channel, db.data.messages.at(0).message).then(() => {
         console.log(`Sending: ${db.data.messages.at(0).booruId}.`)
         db.update(({ messages }) => messages.shift())
     })
-}, { timezone: Bun.env.TZ })
+}, null, true, Bun.env.TZ)
 
 bot.use(async (ctx, next) => {
     const {
