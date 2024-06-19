@@ -1,15 +1,9 @@
 # labmember0
+Publish posts from Danbooru to Telegram.
+## deploy
 
-To install dependencies:
+>docker build -t labmember0 .
 
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.js
-```
-
-This project was created using `bun init` in bun v1.1.12. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+>docker run -d --restart=always --name labmember0 labmember0
+### License
+The source code for the site is licensed under the [MIT](LICENSE) license.
