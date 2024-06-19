@@ -6,11 +6,22 @@ import helpers from './src/helpers.js'
 
 const token = Bun.env.TELEGRAM_BOT_TOKEN
 const channel = Bun.env.TELEGRAM_CHANNEL
+const allowedUsers = Bun.env.ALLOWED_USERS
 
 const bot = new Telegraf(token)
 
+
+
 bot.on(message('link_preview_options'), async (ctx) => {
-    const { message: { text: userMsg } } = ctx
+    const {
+        message:
+        {
+            text: userMsg,
+            from: { id: userId }
+        }
+    } = ctx
+
+    if (!allowedUsers.includes(userId)) return
 
     const booruId = helpers.getDanbooruId(userMsg)
 
