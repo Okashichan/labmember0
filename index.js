@@ -14,7 +14,7 @@ const cronSchedule = Bun.env.CRON
 const initDb = { messages: [] }
 const db = await JSONFilePreset('db.json', initDb)
 
-const bot = new Telegraf(token, { handlerTimeout: Infinity })
+const bot = new Telegraf(token)
 
 const job = new CronJob(cronSchedule, () => {
     if (db.data.messages.length === 0) return
@@ -82,8 +82,6 @@ bot.on(message('link_preview_options'), async (ctx) => {
             }
 
             db.update(({ messages }) => messages.push({ booruId, message, username }))
-
-            await db.write()
 
             ctx.reply(fmt`${bold`Пост заплановано!`}`)
         })
