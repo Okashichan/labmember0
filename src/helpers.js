@@ -62,7 +62,7 @@ const getMedia = (data) => {
         pixivId
     }
 
-    const imagesUrl = data.map(el => el.large_file_url)
+    const imagesUrl = data.filter(el => el.file_ext !== "mp4").map(el => el.large_file_url).reverse()
 
     return {
         info,
@@ -78,8 +78,7 @@ const getMediaGroupMessage = async (id) => {
         fmt`${link(media.info.artist, url)} Original` :
         fmt`${link(media.info.artist, url)}
         \n${italic`Copyright`}\n${media.info.copyright}
-    \n${media.info.characters.length > 1 ? italic`Characters` : italic`Character`}\n${media.info.characters.join('\n')}
-    `
+    \n${media.info.characters.length > 1 ? italic`Characters` : italic`Character`}\n${media.info.characters.join('\n')}`
     const message = [{
         type: 'photo',
         media: media.imagesUrl.at(0),
