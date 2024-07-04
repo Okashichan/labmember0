@@ -18,10 +18,10 @@ const calculateNextCronTime = (cronExpr, iterations = 1) => {
 const stringNormalize = (str) => {
     let chunks = str.replace(/\([^)]*\)/g, '').split(' ')
     let normalized = chunks.map(name => {
-        return name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+        return name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ').trim()
     })
 
-    return normalized
+    return [...new Set(normalized)]
 }
 
 const getDanbooruId = (url) => {
