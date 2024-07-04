@@ -15,6 +15,15 @@ const calculateNextCronTime = (cronExpr, iterations = 1) => {
     return `${UTC.getHours().toString().padStart(2, '0')}:${UTC.getSeconds().toString().padStart(2, '0')} (${UTC.getDate().toString().padStart(2, '0')}/${(UTC.getMonth() + 1).toString().padStart(2, '0')})`
 }
 
+const isValidUrl = (url) => {
+    try {
+        new URL(url)
+        return true
+    } catch (err) {
+        return false
+    }
+}
+
 const stringNormalize = (str) => {
     let chunks = str.replace(/\([^)]*\)/g, '').split(' ')
     let normalized = chunks.map(name => {
@@ -72,11 +81,12 @@ const getMedia = (data) => {
 
 const getMediaGroupMessage = async (id) => {
     const media = getMedia(await getRawPost(id))
-    const url = media.info.pixivId ? `https://www.pixiv.net/artworks/${media.info.pixivId}` : media.info.sourceUrl
+    const urlLink = media.info.pixivId ? link(media.info.artist,`https://www.pixiv.net/artworks/${media.info.pixivId}`) : 
+        isValidUrl(media.info.sourceUrl) ? link(media.info.artist, media.info.sourceUrl) : `${media.info.artist} (${media.info.sourceUrl})`
 
     const caption = media.info.copyright.toLowerCase() === 'original' ?
-        fmt`${link(media.info.artist, url)} Original` :
-        fmt`${link(media.info.artist, url)}
+        fmt`${urlLink} Original` :
+        fmt`${urlLink}
         \n${italic`Copyright`}\n${media.info.copyright}
     \n${media.info.characters.length > 1 ? italic`Characters` : italic`Character`}\n${media.info.characters.join('\n')}`
     const message = [{
